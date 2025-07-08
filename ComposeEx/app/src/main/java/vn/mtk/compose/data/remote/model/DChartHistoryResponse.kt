@@ -1,6 +1,5 @@
 package vn.mtk.compose.data.remote.model
 
-import androidx.compose.ui.text.toLowerCase
 import com.google.gson.annotations.SerializedName
 import vn.mtk.compose.common.Constants
 

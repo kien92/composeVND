@@ -1,4 +1,4 @@
-package vn.mtk.compose.ui.theme
+package vn.mtk.compose.presentation.ui
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

@@ -1,6 +1,5 @@
-package vn.mtk.compose.ui.theme
+package vn.mtk.compose.presentation.ui
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
