@@ -12,3 +12,4 @@ data class DCharPrice(
     val lowPrice: Double,
     val volume: Long
 )
+

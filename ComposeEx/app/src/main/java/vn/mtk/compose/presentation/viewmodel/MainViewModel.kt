@@ -10,14 +10,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import vn.mtk.compose.common.Constants
 import vn.mtk.compose.common.getTodayTimeStamp
+import vn.mtk.compose.domain.model.DCharPrice
 import vn.mtk.compose.domain.model.ResultData
 import vn.mtk.compose.domain.usecase.DChartHistoryUseCase
+import vn.mtk.compose.presentation.mapper.toUiModel
 import vn.mtk.compose.presentation.model.DCharPriceUi
 import vn.mtk.compose.presentation.ui.main.MainState
 
 class MainViewModel(
     private val getDChartHistoryUseCase: DChartHistoryUseCase
-): ViewModel() {
+) : ViewModel() {
     private val _state = MutableStateFlow<MainState>(MainState.Loading)
     val state: StateFlow<MainState> = _state
 
@@ -44,8 +46,9 @@ class MainViewModel(
         _state.value = when (result) {
             is ResultData.Success -> {
                 current = from
-                MainState.Success(result.data)
+                MainState.Success(result.data.map { it.toUiModel() })
             }
+
             is ResultData.Error -> MainState.Error(result.errorType)
         }
 
@@ -64,11 +67,11 @@ class MainViewModel(
         if (currentState !is MainState.Success) return@launch
 
         val (from, to) = getFromToRange()
-        val result = getDChartHistoryUseCase("1D", "VND", from, to)
-
+        val result:ResultData<List<DCharPrice>> = getDChartHistoryUseCase("1D", "VND", from, to)
         _state.value = when (result) {
             is ResultData.Success -> {
-                val updated = (currentState.data + result.data).distinctBy { it.timestamp }
+                val mapperUIData = result.data.map { it.toUiModel() }
+                val updated = (currentState.data + mapperUIData).distinctBy { it.timestamp }
                 current = from
                 MainState.Success(updated)
             }

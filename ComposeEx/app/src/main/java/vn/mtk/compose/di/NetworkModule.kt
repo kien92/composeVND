@@ -5,6 +5,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import vn.mtk.compose.BuildConfig
 import vn.mtk.compose.common.Constants
 import vn.mtk.compose.data.remote.service.ApiVNDService
 import java.util.concurrent.TimeUnit

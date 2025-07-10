@@ -1,6 +1,5 @@
 package vn.mtk.compose.presentation.ui.main
 
-import vn.mtk.compose.domain.model.DCharPrice
 import vn.mtk.compose.domain.model.ErrorType
 import vn.mtk.compose.presentation.model.DCharPriceUi
 
