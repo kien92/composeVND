@@ -1,4 +1,4 @@
-package vn.mtk.compose.presentation.ui
+package vn.mtk.compose.presentation.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

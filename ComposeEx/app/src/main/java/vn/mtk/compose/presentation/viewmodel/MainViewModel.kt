@@ -10,87 +10,116 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import vn.mtk.compose.common.Constants
 import vn.mtk.compose.common.getTodayTimeStamp
-import vn.mtk.compose.domain.model.DCharPrice
 import vn.mtk.compose.domain.model.ResultData
 import vn.mtk.compose.domain.usecase.DChartHistoryUseCase
 import vn.mtk.compose.presentation.mapper.toUiModel
 import vn.mtk.compose.presentation.model.DCharPriceUi
-import vn.mtk.compose.presentation.ui.main.MainState
+import vn.mtk.compose.presentation.ui.main.DCharMainState
 
 class MainViewModel(
     private val getDChartHistoryUseCase: DChartHistoryUseCase
 ) : ViewModel() {
-    private val _state = MutableStateFlow<MainState>(MainState.Loading)
-    val state: StateFlow<MainState> = _state
+    /**
+     * Biến trạng thái view để hiển thị dữ liệu lên màn hình
+     */
+    private val _state = MutableStateFlow<DCharMainState>(DCharMainState.Loading)
+    val state: StateFlow<DCharMainState> = _state
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
-    private var current: Long = getTodayTimeStamp()
-    private val pageSize = 10
-    private val seconds = 86400L
+    private val _currentSelectedItem = MutableStateFlow<DCharPriceUi?>(null)
+    val currentSelectedItem: StateFlow<DCharPriceUi?> = _currentSelectedItem
 
+
+    private var isLoadingMore = false
+    private var current: Long = getTodayTimeStamp()
+
+    /**
+     * Biến kiểm tra trạng thái khi đang load
+     */
     private var _isLoaded = false
     val isLoaded get() = _isLoaded
 
+    private val pageSize = 10 // tối đa số bản ghi cho 1 page khi gọi hoặc xử lý phân trang
+    private val seconds = 86400L //tổng số giây một ngày
+
+    // =====================
+    // INIT & REFRESH giữ liệu
+    // =====================
     fun loadInitial() = viewModelScope.launch {
         if (_isLoaded) return@launch
         _isRefreshing.value = true
         current = getTodayTimeStamp()
 
-        val (from, to) = getFromToRange()
-        val result = withContext(Dispatchers.IO) {
-            getDChartHistoryUseCase(Constants.D, Constants.UNIT, from, to)
+        fetchChartData(from = getFrom(), to = current) { result ->
+            _state.value = result
+            _isLoaded = result is DCharMainState.Success
         }
 
-        _state.value = when (result) {
-            is ResultData.Success -> {
-                current = from
-                MainState.Success(result.data.map { it.toUiModel() })
-            }
-
-            is ResultData.Error -> MainState.Error(result.errorType)
-        }
-
-        delay(Constants.DELAY_LOAD_MORE)
         _isRefreshing.value = false
-        _isLoaded = true
     }
 
-    fun reloadForce() {
+    fun refreshData() {
         _isLoaded = false
         loadInitial()
     }
 
-    fun loadMore() = viewModelScope.launch {
-        val currentState = _state.value
-        if (currentState !is MainState.Success) return@launch
+    // =====================
+    // LOAD MORE
+    // =====================
+    fun loadMoreIfNeeded(lastVisibleIndex: Int, totalItems: Int) {
+        if (_state.value !is DCharMainState.Success) return
+        if (isLoadingMore) return
+        if (lastVisibleIndex < totalItems - 1) return
 
-        val (from, to) = getFromToRange()
-        val result:ResultData<List<DCharPrice>> = getDChartHistoryUseCase("1D", "VND", from, to)
-        _state.value = when (result) {
-            is ResultData.Success -> {
-                val mapperUIData = result.data.map { it.toUiModel() }
-                val updated = (currentState.data + mapperUIData).distinctBy { it.timestamp }
-                current = from
-                MainState.Success(updated)
+        isLoadingMore = true
+
+        viewModelScope.launch {
+            val currentState = _state.value as? DCharMainState.Success ?: return@launch
+            val from = getFrom()
+            val to = current
+
+            fetchChartData(from, to) { result ->
+                _state.value = when (result) {
+                    is DCharMainState.Success -> {
+                        val merged = (currentState.data + result.data)
+                            .distinctBy { it.timestamp }
+                        current = from
+                        DCharMainState.Success(merged)
+                    }
+
+                    else -> result
+                }
+                isLoadingMore = false
             }
-
-            is ResultData.Error -> MainState.Error(result.errorType)
         }
     }
 
-    private fun getFromToRange(): Pair<Long, Long> {
-        val from = current - pageSize * seconds
-        val to = current
-        return Pair(from, to)
-    }
-
-    private val _currentSelectedItem = MutableStateFlow<DCharPriceUi?>(null)
-    val currentSelectedItem: StateFlow<DCharPriceUi?> = _currentSelectedItem
-
+    // =====================
+    // CHỌN ITEM
+    // =====================
     fun selectItem(item: DCharPriceUi) {
         _currentSelectedItem.value = item
     }
 
+    private fun getFrom(): Long = current - (pageSize * seconds)
+
+    private suspend fun fetchChartData(
+        from: Long,
+        to: Long,
+        onResult: (DCharMainState) -> Unit
+    ) {
+        val result = withContext(Dispatchers.IO) {
+            getDChartHistoryUseCase(Constants.D, Constants.UNIT, from, to)
+        }
+
+        val newState = when (result) {
+            is ResultData.Success -> DCharMainState.Success(result.data.map { it.toUiModel() })
+            is ResultData.Error -> DCharMainState.Error(result.errorType)
+        }
+
+        delay(Constants.DELAY_LOAD_MORE)
+        onResult(newState)
+    }
 }

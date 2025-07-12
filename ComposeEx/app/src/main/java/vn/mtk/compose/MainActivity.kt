@@ -1,47 +1,51 @@
 package vn.mtk.compose
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import vn.mtk.compose.presentation.ui.ComposeVPTheme
+import androidx.compose.ui.res.colorResource
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import org.koin.androidx.compose.koinViewModel
+import vn.mtk.compose.presentation.ui.detail.DetailScreen
+import vn.mtk.compose.presentation.viewmodel.MainViewModel
+import androidx.navigation.compose.composable
+import vn.mtk.compose.presentation.ui.theme.ComposeVPTheme
+import vn.mtk.compose.presentation.ui.main.MainScreen
 
+sealed class Screen(val route: String) {
+    data object Main : Screen("main")
+    data object Detail : Screen("detail")
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val viewModel = koinViewModel<MainViewModel>()
+            val navController = rememberNavController()
             ComposeVPTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(colorResource(R.color.background)),
+                ) {
+
+                    NavHost(navController = navController, startDestination = Screen.Main.route) {
+                        composable(Screen.Main.route) { MainScreen(viewModel, navController) }
+                        composable(Screen.Detail.route) { DetailScreen(viewModel, navController) }
+                    }
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ComposeVPTheme {
-        Greeting("Android")
-    }
-}

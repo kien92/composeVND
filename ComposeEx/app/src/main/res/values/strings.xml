@@ -1,3 +1,23 @@
 <resources>
-    <string name="app_name">ComposeVP</string>
+    <string name="app_name">DChar App</string>
+    <string name="date">Ngày</string>
+    <string name="price">Giá</string>
+    <string name="change">Tăng giảm</string>
+    <string name="volume">Khối lượng</string>
+    <string name="stock_detail_title">Chi tiết cổ phiếu</string>
+    <string name="label_date">Ngày</string>
+    <string name="label_symbol">Mã chứng khoán</string>
+    <string name="label_open_price">Giá mở cửa</string>
+    <string name="label_close_price">Giá đóng cửa</string>
+    <string name="label_highest_price">Giá cao nhất</string>
+    <string name="label_lowest_price">Giá thấp nhất</string>
+    <string name="label_volume">Khối lượng</string>
+    <string name="error_server">Có lỗi xảy ra, vui lòng thử lại sau.</string>
+    <string name="error_no_internet">Không có kết nối mạng.</string>
+    <string name="error_timeout">Đã quá thời gian xử lý.</string>
+    <string name="error_unknown">Lỗi không xác định.</string>
+    <string name="error_no_data">Không có dữ liệu</string>
+    <string name="des_img">Image</string>
+    <string name="ma_cp">Mã VND</string>
+
 </resources>

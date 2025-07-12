@@ -10,3 +10,11 @@ data class DCharPriceUi(
     val lowPrice: Double,
     val volume: Long
 )
+
+fun DCharPriceUi.compareTo(prev: DCharPriceUi?): PriceChange? {
+    if (prev == null || prev.closePrice == 0.0) return null
+    val diff = closePrice - prev.closePrice
+    val percent = (diff / prev.closePrice) * 100
+    return PriceChange(diff, percent)
+}
+
