@@ -1,6 +1,5 @@
 package vn.mtk.compose.domain.model
 
-import androidx.room.PrimaryKey
 
 data class DCharPrice(
     val timestamp: Long,

@@ -85,9 +85,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    //Thêm lib networking
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
+
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
@@ -95,6 +97,19 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.koin.core)
 
+    // Thêm Navigataion lib
     implementation(libs.androidx.navigation.compose)
+    // Thêm MockK
+    testImplementation(libs.mockk)
+    // Thêm Coroutines Test
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(kotlin("test"))
+    testImplementation(libs.junit.jupiter)
 
+}
+
+// Nằm ngoài các block plugins / android / dependencies:
+tasks.withType<Test> {
+    // Cho phép chạy JUnit5
+    useJUnitPlatform()
 }

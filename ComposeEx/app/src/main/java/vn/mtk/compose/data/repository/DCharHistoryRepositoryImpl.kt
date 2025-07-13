@@ -17,24 +17,29 @@ class DCharHistoryRepositoryImpl(
     override suspend fun getPriceHistory(
         resolution: String, symbol: String, from: Long, to: Long
     ): ResultData<List<DCharPrice>> {
+        // 1. Thử fetch local nếu có sẽ lấy dữ liệu lưu ở cache ở local
         val localResult = dataSource.getDCharHistoryFromLocal(resolution, symbol, from, to)
-            .sortedByDescending { it.timestamp }.distinctBy { it.timestamp }
+            .distinctBy { it.timestamp } // lọc dữ lieu trung trước để giảm tải data trùng nếu có
+            .sortedByDescending { it.timestamp } // săp sếp dữ liệu
 
         if (localResult.isNotEmpty()) {
             return ResultData.Success(localResult.map { it.toDomain() })
         }
 
+        // 2. Nếu local trống, gọi remote call api load dữ liệu mới
         return runCatching {
             val response = apiService.getDChartHistory(resolution, symbol, from, to)
             if (response.isResponseStatusOk()) {
                 val remoteData = response.toPriceList(resolution, symbol)
-                    .sortedByDescending { it.timestamp }.distinctBy { it.timestamp }
-                dataSource.insertPriceHistory(remoteData.map { it.toEntity() })
+                    .distinctBy { it.timestamp }
+                    .sortedByDescending { it.timestamp }
+                dataSource.insertPriceHistory(remoteData.map { it.toEntity() }) // thêm bản ghi mới vào trong local để cache
                 ResultData.Success(remoteData)
             } else {
                 ResultData.Error(ErrorType.SERVER_ERROR)
             }
         }.getOrElse {
+            // Xử lý ngoại lệ
             ResultData.Error(ErrorDataType.map(it))
         }
 

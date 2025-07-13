@@ -2,7 +2,7 @@ package vn.mtk.compose.common
 
 import android.annotation.SuppressLint
 import androidx.compose.ui.graphics.Color
-import vn.mtk.compose.presentation.model.PriceTrend
+import vn.mtk.compose.presentation.model.DCharPriceTrend
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -27,10 +27,10 @@ fun formatVolume(volume: Long): String {
     }
 }
 
-fun PriceTrend.toColor(): Color = when (this) {
-    PriceTrend.UP -> Color.Green
-    PriceTrend.DOWN -> Color.Red
-    PriceTrend.FLAT -> Color.Yellow
+fun DCharPriceTrend.toColor(): Color = when (this) {
+    DCharPriceTrend.UP -> Color.Green
+    DCharPriceTrend.DOWN -> Color.Red
+    DCharPriceTrend.FLAT -> Color.Yellow
 }
 
 

@@ -17,7 +17,7 @@ import vn.mtk.compose.presentation.ui.theme.AppDimens
 
 @Composable
 fun DChartDetailItem(index: Int, label: String, content: String, contentColor: Color = Color.White) {
-    val backgroundColor = if (index % 2 == 0) Color.Transparent else Color.DarkGray
+    val backgroundColor =  if (index % 2 == 0) Color(0xffd5d8dc)  else Color(0xFF808b96)
     Row(
         modifier = Modifier
             .background(backgroundColor)

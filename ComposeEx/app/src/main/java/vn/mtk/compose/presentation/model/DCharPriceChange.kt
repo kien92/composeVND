@@ -1,20 +1,20 @@
 package vn.mtk.compose.presentation.model
 
-data class PriceChange(
+data class DCharPriceChange(
     val diff: Double,
     val percent: Double
 ) {
-    val trend: PriceTrend
+    val trend: DCharPriceTrend
         get() = when {
-            diff > 0 -> PriceTrend.UP
-            diff < 0 -> PriceTrend.DOWN
-            else -> PriceTrend.FLAT
+            diff > 0 -> DCharPriceTrend.UP
+            diff < 0 -> DCharPriceTrend.DOWN
+            else -> DCharPriceTrend.FLAT
         }
 
     fun formatted(): String {
         val sign = when (trend) {
-            PriceTrend.UP -> "+"
-            PriceTrend.DOWN -> "-"
+            DCharPriceTrend.UP -> "+"
+            DCharPriceTrend.DOWN -> "-"
             else -> ""
         }
         return "$sign${"%.2f".format(kotlin.math.abs(diff))} (${sign}${"%.2f".format(kotlin.math.abs(percent))}%)"

@@ -44,14 +44,14 @@ fun DetailScreen(
                 title = { Text(stringResource(R.string.stock_detail_title)) },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors().copy(
                     containerColor = colorResource(R.color.dart_background),
-                    titleContentColor = Color.White
+                    titleContentColor = Color.Black
                 ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.des_img),
-                            tint = Color.White
+                            tint = Color.Black
                         )
                     }
                 }

@@ -20,7 +20,7 @@ class MainViewModel(
     private val getDChartHistoryUseCase: DChartHistoryUseCase
 ) : ViewModel() {
     /**
-     * Biến trạng thái view để hiển thị dữ liệu lên màn hình
+     * Biến lưu trạng thái view để hiển thị dữ liệu lên màn hình
      */
     private val _state = MutableStateFlow<DCharMainState>(DCharMainState.Loading)
     val state: StateFlow<DCharMainState> = _state
@@ -44,9 +44,9 @@ class MainViewModel(
     private val pageSize = 10 // tối đa số bản ghi cho 1 page khi gọi hoặc xử lý phân trang
     private val seconds = 86400L //tổng số giây một ngày
 
-    // =====================
-    // INIT & REFRESH giữ liệu
-    // =====================
+    /**
+    INIT  giữ liệu
+     */
     fun loadInitial() = viewModelScope.launch {
         if (_isLoaded) return@launch
         _isRefreshing.value = true
@@ -60,14 +60,17 @@ class MainViewModel(
         _isRefreshing.value = false
     }
 
+    /**
+     * REFRESH giữ liệu
+     */
     fun refreshData() {
         _isLoaded = false
         loadInitial()
     }
 
-    // =====================
-    // LOAD MORE
-    // =====================
+    /**
+    LOAD MORE thêm dũ liệu
+     */
     fun loadMoreIfNeeded(lastVisibleIndex: Int, totalItems: Int) {
         if (_state.value !is DCharMainState.Success) return
         if (isLoadingMore) return
@@ -83,8 +86,7 @@ class MainViewModel(
             fetchChartData(from, to) { result ->
                 _state.value = when (result) {
                     is DCharMainState.Success -> {
-                        val merged = (currentState.data + result.data)
-                            .distinctBy { it.timestamp }
+                        val merged = (currentState.data + result.data).distinctBy { it.timestamp }
                         current = from
                         DCharMainState.Success(merged)
                     }
@@ -96,19 +98,20 @@ class MainViewModel(
         }
     }
 
-    // =====================
-    // CHỌN ITEM
-    // =====================
+    /**
+       CHỌN ITEM
+     */
     fun selectItem(item: DCharPriceUi) {
         _currentSelectedItem.value = item
     }
 
     private fun getFrom(): Long = current - (pageSize * seconds)
 
+    /**
+     * Function thực hiện callApi
+     */
     private suspend fun fetchChartData(
-        from: Long,
-        to: Long,
-        onResult: (DCharMainState) -> Unit
+        from: Long, to: Long, onResult: (DCharMainState) -> Unit
     ) {
         val result = withContext(Dispatchers.IO) {
             getDChartHistoryUseCase(Constants.D, Constants.UNIT, from, to)

@@ -22,16 +22,17 @@ import vn.mtk.compose.presentation.model.compareTo
 import vn.mtk.compose.presentation.ui.theme.AppDimens
 
 @Composable
-fun DCharPriceItemList (
+fun DCharPriceItemList(
     index: Int,
     currentRecord: DCharPriceUi,
     previousRecord: DCharPriceUi?,
     clickable: () -> Unit
 ) {
-    val backgroundColor = if (index % 2 == 0) Color.Transparent else Color.DarkGray
+    val backgroundColor = if (index % 2 == 0) Color(0xffd5d8dc)  else Color(0xFF808b96)
+    val textColor =Color.White
     val priceChange = currentRecord.compareTo(previousRecord)
     val priceColor = priceChange?.trend?.toColor() ?: Color.White
-    val changeText = priceChange?.formatted() ?: "--"
+    val changeText = priceChange?.formatted() ?: ""
 
     Row(
         modifier = Modifier
@@ -48,7 +49,7 @@ fun DCharPriceItemList (
             formatTimeStamp(currentRecord.timestamp),
             modifier = Modifier.weight(1f),
             fontSize = 12.sp,
-            color = Color.White
+            color = textColor
         )
         Text(
             "${currentRecord.closePrice}",
@@ -67,7 +68,7 @@ fun DCharPriceItemList (
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.End,
             fontSize = 12.sp,
-            color = Color.White
+            color = textColor
         )
     }
 }
